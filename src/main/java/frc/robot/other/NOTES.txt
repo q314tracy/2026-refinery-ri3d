@@ -15,3 +15,11 @@ RRturn = 9
 gyro = 10
 
 shooter = 11
+shooter feed = 12
+
+intake rollers = 13
+intake extend = 14
+
+climber left = 15
+climber right = 16
+climber extend = 17

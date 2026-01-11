@@ -4,6 +4,8 @@
 
 package frc.robot.utils;
 
+import static frc.robot.utils.Constants.ShooterConstants.k_shooterconfig;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -33,8 +35,26 @@ public class Constants {
     public static final Pose2d k_initpose = new Pose2d(2, 2, new Rotation2d());
   }
 
-  public class ShooterConstants {
+  public class IntakeConstants {
+    public static final int k_intakerollerID = 13;
+    public static final int k_intakeextendID = 14;
+    public static final TalonFXConfiguration k_intakerollerconfig = new TalonFXConfiguration();
+    static {
+      k_intakerollerconfig.CurrentLimits.StatorCurrentLimit = 20;
+      k_intakerollerconfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      k_intakerollerconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      k_intakerollerconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    }
+    public static final TalonFXConfiguration k_intakeextendconfig = new TalonFXConfiguration();
+    static {
+      k_intakeextendconfig.CurrentLimits.StatorCurrentLimit = 20;
+      k_intakeextendconfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      k_intakeextendconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      k_intakeextendconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    }
+  }
 
+  public class ShooterConstants {
     public static final int k_shootermotorID = 11;
     public static final int k_shooterintakeID = 12;
     public static final TalonFXConfiguration k_shooterconfig = new TalonFXConfiguration();
@@ -51,7 +71,6 @@ public class Constants {
       k_shooterintakeconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       k_shooterintakeconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     }
-
     public static final double k_shooterwheeldiam = Units.inchesToMeters(4); //meters
     public static final double k_shooterwheelcircum = Math.PI * k_shooterwheeldiam;
 
