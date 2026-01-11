@@ -14,8 +14,10 @@ RRdrive = 8
 RRturn = 9
 gyro = 10
 
-shooter = 11
-shooter feed = 12
+shooter1 = 18
+shooter2 = 19
+shooterfeed1 = 20
+shooterfeed2 = 21
 
 intake rollers = 13
 intake extend = 14
@@ -23,3 +25,8 @@ intake extend = 14
 climber left = 15
 climber right = 16
 climber extend = 17
+
+dump sequence
+    intake reverses direction
+    feed motor forward at normal speed
+    shooter at slow speed setpoint after spin up time

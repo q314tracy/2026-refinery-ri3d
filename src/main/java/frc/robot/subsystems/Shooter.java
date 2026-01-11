@@ -4,24 +4,20 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.utils.Constants.ShooterConstants.*;
 
 public class Shooter extends SubsystemBase {
 
-  // motors
-  private final TalonFX m_shooter = new TalonFX(k_shootermotorID);
-  private final TalonFX m_shooterfeed = new TalonFX(k_shootermotorID);
-
-  // configurators
-  private final TalonFXConfigurator m_shooterconfigurator = m_shooter.getConfigurator();
-  private final TalonFXConfigurator m_shooterfeedconfigurator = m_shooterfeed.getConfigurator();
+  // motor instances
+  private final TalonFX m_shooter1 = new TalonFX(k_shooter1ID);
+  private final TalonFX m_shooter2 = new TalonFX(k_shooter2ID);
 
   // ff and pid controller, need to characterize
   private final ProfiledPIDController m_velocityPID = new ProfiledPIDController(
@@ -36,11 +32,12 @@ public class Shooter extends SubsystemBase {
   // misc vars
   private double velocityMPS = 0;
 
+  /** Shooter subsystem. Duh. */
   public Shooter() {
 
     // apply the built config to the motor
-    m_shooterconfigurator.apply(k_shooterconfig);
-    m_shooterfeedconfigurator.apply(k_shooterintakeconfig);
+    m_shooter1.getConfigurator().apply(k_shooterconfig);
+    m_shooter2.getConfigurator().apply(k_shooterconfig);
   }
 
   /** Closed loop control using PIDF. */
@@ -48,31 +45,30 @@ public class Shooter extends SubsystemBase {
     m_velocityPID.setGoal(velocitysp);
     double pid = m_velocityPID.calculate(velocityMPS);
     double ff = m_velocityFF.calculate(velocitysp);
-    m_shooter.setVoltage(ff + pid);
+    m_shooter1.setVoltage(ff + pid);
+    m_shooter2.setVoltage(ff + pid);
+    SmartDashboard.putNumber("output", ff + pid);
   }
 
   /** Open loop control using only the FF */
   public void openLoop(double velocitysp) {
-    m_shooter.setVoltage(m_velocityFF.calculate(velocitysp));
+    double ff = m_velocityFF.calculate(velocitysp);
+    m_shooter1.setVoltage(ff);
+    m_shooter2.setVoltage(ff);
   }
 
-  /** Stops the shooter motor. */
+  /** Stops the shooter motor and resets the PID controller to zero.*/
   public void stopShooter() {
-    m_shooter.setVoltage(0);
+    m_shooter1.stopMotor();
+    m_velocityPID.reset(0);
   }
 
-  /** Runs the feeder roller. */
-  public void feed() {
-    m_shooterfeed.setVoltage(12);
-  }
-
-  /** Stops the feeder roller. */
-  public void stopfeed() {
-    m_shooterfeed.setVoltage(0);
+  public double getVelocity() {
+    return velocityMPS;
   }
 
   @Override
   public void periodic() {
-    velocityMPS = (m_shooter.getVelocity().getValue().in(Units.RPM) * k_shooterwheelcircum) / 60; //returns in units of m/s
+    velocityMPS = ((m_shooter1.getVelocity().getValue().in(Units.RPM) / k_shooterratio) * k_shooterwheelcircum) / 60; //returns in units of m/s
   }
 }
