@@ -1,0 +1,17 @@
+CAN IDs
+
+MK5N modules, R3 ratio
+Pigeon2 gyroscope
+CTRE swerve template
+
+FLdrive = 2
+FLturn = 3
+FRdrive = 4
+FRturn = 5
+RLdrive = 6
+RLturn = 7
+RRdrive = 8
+RRturn = 9
+gyro = 10
+
+shooter = 11
