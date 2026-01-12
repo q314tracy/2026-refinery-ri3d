@@ -4,23 +4,37 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.mechanisms.Climber;
+import frc.robot.subsystems.mechanisms.Feeder;
+import frc.robot.subsystems.mechanisms.Hopper;
+import frc.robot.subsystems.mechanisms.Intake;
+import frc.robot.subsystems.mechanisms.Shooter;
+import frc.robot.utils.SwerveTelemetry;
+import frc.robot.utils.SwerveTunerConstants;
+import frc.robot.utils.Constants.SwerveConstants;
 
 public class RobotContainer {
 
   // joystick
   private final CommandGenericHID m_driverctlr = new CommandGenericHID(0);
 
-  // subsystems
+  // other subsystems
+  private final SwerveTelemetry m_swervetelemetry = new SwerveTelemetry(SwerveConstants.k_maxlinspeed);
+  private final Swerve m_swerve = SwerveTunerConstants.createDrivetrain();
   private final Climber m_climber = new Climber();
   private final Shooter m_shooter = new Shooter();
   private final Feeder m_feeder = new Feeder();
@@ -32,28 +46,57 @@ public class RobotContainer {
   private boolean hopperdeployed = false;
 
   public RobotContainer() {
+
+    // default commands
     m_shooter.setDefaultCommand(shooterDefault());
+    m_swerve.setDefaultCommand(swerveDefault());
+
+    // start telemtry for swerve
+    m_swerve.registerTelemetry(m_swervetelemetry::telemeterize);
+
+    // configure triggers
     configureBindings();
   }
 
   private void configureBindings() {
+    // idles drivetrain when disabled
+    RobotModeTriggers.disabled().whileTrue(
+        m_swerve.applyRequest(() -> new SwerveRequest.Idle()).ignoringDisable(true));
+
     // shooter bindings
-    m_driverctlr.button(1).whileTrue(runEnd(() -> shootervel = 10, () -> shootervel = 0));
+    m_driverctlr.button(1).whileTrue(
+        runEnd(() -> shootervel = 10, () -> shootervel = 0));
     m_driverctlr.button(2).onTrue(
-      run(() -> m_feeder.feed(), m_feeder)
-        .withTimeout(1)
-        .finallyDo(() -> m_feeder.stop()));
+        run(() -> m_feeder.feed(), m_feeder)
+            .withTimeout(1)
+            .finallyDo(() -> m_feeder.stop()));
 
     // hopper bindings
     m_driverctlr.button(8).onTrue(
-      runOnce(() -> m_hopper.extend(), m_hopper)
-      .until(() -> m_hopper.bootyCurrent() > 15)
-      .finallyDo(() -> runOnce(() -> m_hopper.stop(), m_hopper)));
+        runOnce(() -> m_hopper.extend(), m_hopper)
+            .until(() -> m_hopper.bootyCurrent() > 15)
+            .finallyDo(() -> runOnce(() -> m_hopper.stop(), m_hopper)));
   }
 
   /** Default command for the shooter subsytem. */
   public Command shooterDefault() {
     return run(() -> m_shooter.closedLoop(shootervel), m_shooter);
+  }
+
+  /** Default operator controlled method for swerve subsystem. */
+  public Command swerveDefault() {
+    return m_swerve.applyRequest(() -> new SwerveRequest.FieldCentric()
+        .withDeadband(SwerveConstants.k_maxlinspeed * 0.1) // 10% deadband
+        .withRotationalDeadband(SwerveConstants.k_maxrotspeed * 0.1) // 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // Use open-loop control for drive motors
+        .withVelocityX(0.0) // x velocity
+        .withVelocityY(0.0) // y velocity
+        .withRotationalRate(0.0) // z rot velocity
+    );
+  }
+
+  public Command swerveBrake() {
+    return m_swerve.applyRequest(() -> new SwerveRequest.SwerveDriveBrake());
   }
 
   public Command getAutonomousCommand() {

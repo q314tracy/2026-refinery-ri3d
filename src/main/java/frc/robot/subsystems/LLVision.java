@@ -6,9 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Vision extends SubsystemBase {
+public class LLVision extends SubsystemBase {
 
-  public Vision() {}
+  public LLVision() {}
 
   @Override
   public void periodic() {

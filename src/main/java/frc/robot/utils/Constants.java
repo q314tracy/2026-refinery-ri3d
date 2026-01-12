@@ -4,12 +4,14 @@
 
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -21,17 +23,9 @@ public class Constants {
     public static final double k_maxrotspeedteleop = 2 * Math.PI;
   }
 
-  public class SwerveDriveConstants {
-    // may or may not be needed
-    public static final double k_wheelradius = Units.inchesToMeters(2);
-    public static final double k_wheelcircumference = 2 * Math.PI * k_wheelradius;
-    public static final double k_trackwidth = Units.inchesToMeters(24);
-    public static final double k_drivegearratio = 5.27;
-    public static final double k_turngearratio = 26.09;
-    public static final double k_drivemotormaxRPM = 6000;
-    public static final double k_maxlinspeed = (k_drivemotormaxRPM / k_drivegearratio) * k_wheelcircumference / 60; // meters/sec
-    public static final double k_maxrotspeed = (2 * k_maxlinspeed) / k_trackwidth;
-    public static final Pose2d k_initpose = new Pose2d(2, 2, new Rotation2d());
+  public class SwerveConstants {
+    public static final double k_maxlinspeed = 1.0 * SwerveTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static final double k_maxrotspeed = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
   }
 
   public class ShooterConstants {

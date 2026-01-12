@@ -12,7 +12,11 @@ RLdrive = 6
 RLturn = 7
 RRdrive = 8
 RRturn = 9
-gyro = 10
+FLenc = 10
+FRenc = 11
+RLenc = 12
+RRenc = 13
+gyro = 14
 
 shooter1 = 18
 shooter2 = 19
