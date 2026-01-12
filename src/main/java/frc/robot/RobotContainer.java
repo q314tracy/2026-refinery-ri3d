@@ -4,17 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import frc.robot.subsystems.Swerve;
@@ -25,6 +25,7 @@ import frc.robot.subsystems.mechanisms.Intake;
 import frc.robot.subsystems.mechanisms.Shooter;
 import frc.robot.utils.SwerveTelemetry;
 import frc.robot.utils.SwerveTunerConstants;
+import frc.robot.utils.Constants.OIConstants;
 import frc.robot.utils.Constants.SwerveConstants;
 
 public class RobotContainer {
@@ -46,14 +47,14 @@ public class RobotContainer {
   private boolean hopperdeployed = false;
 
   public RobotContainer() {
-
+    // pathfinding algo
+    Pathfinding.setPathfinder(new LocalADStar());
+    m_swerve.configureAutobuilder();
     // default commands
     m_shooter.setDefaultCommand(shooterDefault());
     m_swerve.setDefaultCommand(swerveDefault());
-
     // start telemtry for swerve
     m_swerve.registerTelemetry(m_swervetelemetry::telemeterize);
-
     // configure triggers
     configureBindings();
   }
@@ -62,7 +63,10 @@ public class RobotContainer {
     // idles drivetrain when disabled
     RobotModeTriggers.disabled().whileTrue(
         m_swerve.applyRequest(() -> new SwerveRequest.Idle()).ignoringDisable(true));
-
+    // drivetrain bindings
+    m_driverctlr.button(6).whileTrue(
+      m_swerve.applyRequest(() -> new SwerveRequest.SwerveDriveBrake())
+    );
     // shooter bindings
     m_driverctlr.button(1).whileTrue(
         runEnd(() -> shootervel = 10, () -> shootervel = 0));
@@ -70,7 +74,6 @@ public class RobotContainer {
         run(() -> m_feeder.feed(), m_feeder)
             .withTimeout(1)
             .finallyDo(() -> m_feeder.stop()));
-
     // hopper bindings
     m_driverctlr.button(8).onTrue(
         runOnce(() -> m_hopper.extend(), m_hopper)
@@ -89,14 +92,10 @@ public class RobotContainer {
         .withDeadband(SwerveConstants.k_maxlinspeed * 0.1) // 10% deadband
         .withRotationalDeadband(SwerveConstants.k_maxrotspeed * 0.1) // 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // Use open-loop control for drive motors
-        .withVelocityX(0.0) // x velocity
-        .withVelocityY(0.0) // y velocity
-        .withRotationalRate(0.0) // z rot velocity
+        .withVelocityX(-m_driverctlr.getRawAxis(1) * SwerveConstants.k_maxlinspeed) // x velocity
+        .withVelocityY(-m_driverctlr.getRawAxis(0) * SwerveConstants.k_maxlinspeed) // y velocity
+        .withRotationalRate(-m_driverctlr.getRawAxis(4) * SwerveConstants.k_maxrotspeed) // z rot velocity
     );
-  }
-
-  public Command swerveBrake() {
-    return m_swerve.applyRequest(() -> new SwerveRequest.SwerveDriveBrake());
   }
 
   public Command getAutonomousCommand() {
