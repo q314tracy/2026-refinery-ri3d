@@ -14,25 +14,21 @@ public class Feeder extends SubsystemBase {
 
   // motor instances
   private final TalonFX m_shooterfeed1 = new TalonFX(k_shooterfeed1ID);
-  private final TalonFX m_shooterfeed2 = new TalonFX(k_shooterfeed2ID);
 
   public Feeder() {
 
     // apply configs
     m_shooterfeed1.getConfigurator().apply(k_shooterfeedconfig);
-    m_shooterfeed2.getConfigurator().apply(k_shooterfeedconfig);
   }
 
   /** Runs the feeder roller. */
   public void feed() {
-    m_shooterfeed1.setVoltage(6);
-    m_shooterfeed2.setVoltage(6);
+    m_shooterfeed1.setVoltage(12);
   }
 
   /** Stops the feeder roller. */
   public void stop() {
     m_shooterfeed1.setVoltage(0);
-    m_shooterfeed2.setVoltage(0);
   }
 
   @Override

@@ -19,16 +19,13 @@ RRenc = 13
 gyro = 14
 
 shooter1 = 18
-shooter2 = 19
 shooterfeed1 = 20
-shooterfeed2 = 21
 
-intake rollers = 13
-intake extend = 14
+intake rollers = 22
+intake extend = 23
 
-climber left = 15
-climber right = 16
-climber extend = 17
+climber left = 24
+climber right = 25
 
 dump sequence
     intake reverses direction

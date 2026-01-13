@@ -17,7 +17,6 @@ public class Shooter extends SubsystemBase {
 
   // motor instances
   private final TalonFX m_shooter1 = new TalonFX(k_shooter1ID);
-  private final TalonFX m_shooter2 = new TalonFX(k_shooter2ID);
 
   // ff and pid controller, need to characterize
   private final ProfiledPIDController m_velocityPID = new ProfiledPIDController(
@@ -37,7 +36,6 @@ public class Shooter extends SubsystemBase {
 
     // apply the built config to the motor
     m_shooter1.getConfigurator().apply(k_shooterconfig);
-    m_shooter2.getConfigurator().apply(k_shooterconfig);
   }
 
   /** Closed loop control using PIDF. */
@@ -46,7 +44,6 @@ public class Shooter extends SubsystemBase {
     double pid = m_velocityPID.calculate(velocityMPS);
     double ff = m_velocityFF.calculate(velocitysp);
     m_shooter1.setVoltage(ff + pid);
-    m_shooter2.setVoltage(ff + pid);
     SmartDashboard.putNumber("output", ff + pid);
   }
 
@@ -54,7 +51,6 @@ public class Shooter extends SubsystemBase {
   public void openLoop(double velocitysp) {
     double ff = m_velocityFF.calculate(velocitysp);
     m_shooter1.setVoltage(ff);
-    m_shooter2.setVoltage(ff);
   }
 
   /** Stops the shooter motor and resets the PID controller to zero.*/

@@ -4,16 +4,19 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
+import static frc.robot.utils.Constants.ShooterConstants.k_shootermaxvel;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -67,18 +70,27 @@ public class RobotContainer {
     m_driverctlr.button(6).whileTrue(
       m_swerve.applyRequest(() -> new SwerveRequest.SwerveDriveBrake())
     );
-    // shooter bindings
-    m_driverctlr.button(1).whileTrue(
-        runEnd(() -> shootervel = 10, () -> shootervel = 0));
-    m_driverctlr.button(2).onTrue(
-        run(() -> m_feeder.feed(), m_feeder)
-            .withTimeout(1)
-            .finallyDo(() -> m_feeder.stop()));
-    // hopper bindings
-    m_driverctlr.button(8).onTrue(
-        runOnce(() -> m_hopper.extend(), m_hopper)
-            .until(() -> m_hopper.bootyCurrent() > 15)
-            .finallyDo(() -> runOnce(() -> m_hopper.stop(), m_hopper)));
+    m_driverctlr.button(1).whileTrue(runEnd(() -> m_feeder.feed(), () -> m_feeder.stop(), m_feeder));
+    m_driverctlr.button(2).whileTrue(runEnd(() -> m_shooter.openLoop(k_shootermaxvel), () -> m_shooter.stopShooter(), m_shooter));
+    m_driverctlr.povLeft().whileTrue(runEnd(() -> m_hopper.retract(), () -> m_hopper.stop(), m_hopper));
+    m_driverctlr.povRight().whileTrue(runEnd(() -> m_hopper.extend(), () -> m_hopper.stop(), m_hopper));
+    m_driverctlr.button(3).whileTrue(runEnd(() -> m_intake.intake(), () -> m_intake.stop(), m_intake));
+    m_driverctlr.povUp().whileTrue(runEnd(() -> m_climber.climberManual(3), () -> m_climber.climberStop(), m_climber));
+    m_driverctlr.povDown().whileTrue(runEnd(() -> m_climber.climberManual(-3), () -> m_climber.climberStop(), m_climber));
+    m_driverctlr.button(7).onTrue(run(() -> m_climber.climberExtend(), m_climber));
+    m_driverctlr.button(8).onTrue(run(() -> m_climber.climberRetractClosedLoop(0)));
+    // // shooter bindings
+    // m_driverctlr.button(1).whileTrue(
+    //     runEnd(() -> shootervel = 10, () -> shootervel = 0));
+    // m_driverctlr.button(2).onTrue(
+    //     run(() -> m_feeder.feed(), m_feeder)
+    //         .withTimeout(1)
+    //         .finallyDo(() -> m_feeder.stop()));
+    // // hopper bindings
+    // m_driverctlr.button(8).onTrue(
+    //     runOnce(() -> m_hopper.extend(), m_hopper)
+    //         .until(() -> m_hopper.bootyCurrent() > 15)
+    //         .finallyDo(() -> runOnce(() -> m_hopper.stop(), m_hopper)));
   }
 
   /** Default command for the shooter subsytem. */
@@ -89,16 +101,15 @@ public class RobotContainer {
   /** Default operator controlled method for swerve subsystem. */
   public Command swerveDefault() {
     return m_swerve.applyRequest(() -> new SwerveRequest.FieldCentric()
-        .withDeadband(SwerveConstants.k_maxlinspeed * 0.1) // 10% deadband
-        .withRotationalDeadband(SwerveConstants.k_maxrotspeed * 0.1) // 10% deadband
+        .withRotationalDeadband(SwerveConstants.k_maxrotspeed * OIConstants.k_deadzone) // 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // Use open-loop control for drive motors
-        .withVelocityX(-m_driverctlr.getRawAxis(1) * SwerveConstants.k_maxlinspeed) // x velocity
-        .withVelocityY(-m_driverctlr.getRawAxis(0) * SwerveConstants.k_maxlinspeed) // y velocity
-        .withRotationalRate(-m_driverctlr.getRawAxis(4) * SwerveConstants.k_maxrotspeed) // z rot velocity
+        .withVelocityX(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(1), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.1) // x velocity
+        .withVelocityY(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(0), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.1) // y velocity
+        .withRotationalRate(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(4), OIConstants.k_deadzone) * SwerveConstants.k_maxrotspeed) // z rot velocity
     );
   }
 
   public Command getAutonomousCommand() {
-    return print("No autonomous command configured");
+    return print("no command configured");
   }
 }

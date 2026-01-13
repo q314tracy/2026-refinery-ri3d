@@ -14,10 +14,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import static frc.robot.utils.Constants.SwerveConstants.*;
 import frc.robot.utils.SwerveTunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -258,6 +261,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         },
         this // Reference to this subsystem to set requirements
     );
+    }
+
+    public Command pathfind(Pose2d pose) {
+        return AutoBuilder.pathfindToPose(pose, PathConstraints.unlimitedConstraints(12));
     }
 
     /**

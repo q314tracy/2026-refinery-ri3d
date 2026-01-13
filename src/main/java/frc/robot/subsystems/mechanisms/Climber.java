@@ -11,7 +11,13 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.Constants.ClimberConstants;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static frc.robot.utils.Constants.ClimberConstants.*;
 
 public class Climber extends SubsystemBase {
@@ -19,7 +25,6 @@ public class Climber extends SubsystemBase {
   // motor instances
   private final TalonFX m_leftclimber = new TalonFX(k_leftclimberID);
   private final TalonFX m_rightclimber = new TalonFX(k_rightclimberID);
-  private final TalonFX m_climberextend = new TalonFX(k_climberextendID);
 
   // climber PIDF
   private final ProfiledPIDController m_climbPID = new ProfiledPIDController(
@@ -38,29 +43,13 @@ public class Climber extends SubsystemBase {
 
   /** Climber subsystem. Includes deploying and climbing. */
   public Climber() {
+    // apply configs
     m_leftclimber.getConfigurator().apply(k_climberconfig);
     m_rightclimber.getConfigurator().apply(k_climberconfig);
-    m_climberextend.getConfigurator().apply(k_climberextendconfig);
-  }
 
-  /** Deploys the climber assembly. */
-  public void deployExtender() {
-    m_climberextend.setVoltage(3);
-  }
-
-  /** Retracts the climber assembly. */
-  public void retractExtender() {
-    m_climberextend.setVoltage(-3);
-  }
-
-  /** Stops the climber extension motor. */
-  public void stopExtender() {
-    m_climberextend.stopMotor();
-  }
-
-  /** Extender current for sensing when at mechanical stops. */
-  public double extenderCurrent() {
-    return m_climberextend.getStatorCurrent().getValue().in(Units.Amps);
+    // reset positions
+    m_leftclimber.setPosition(0);
+    m_rightclimber.setPosition(0);
   }
 
   /** Retracts the climber with PID control. */
@@ -79,38 +68,33 @@ public class Climber extends SubsystemBase {
     m_rightclimber.setVoltage(ff);
   }
 
-  /** Extends the climbers out to their high limit. */
-  public void climberExtend() {
-    m_leftclimber.setVoltage(leftpos < k_highlimit ? 6 : 0);
-    m_rightclimber.setVoltage(rightpos < k_highlimit ? 6 : 0);
-  }
-
-  public void leftClimberTest(double volts) {
+  public void climberManual(double volts) {
     m_leftclimber.setVoltage(volts);
-  }
-  public void rightClimberTest(double volts) {
     m_rightclimber.setVoltage(volts);
   }
 
-  /**
-   * Re-synchronizes the climbers if they go out of sync. Currently set to extend
-   * out until in tolerance.
-   */
-  public void synchronize() {
-    if (!isRational()) {
-      if (leftpos > rightpos)
-        m_rightclimber.setVoltage(6);
-      if (rightpos > leftpos)
-        m_leftclimber.setVoltage(6);
+  public void climberStop() {
+    m_leftclimber.stopMotor();
+    m_rightclimber.stopMotor();
+  }
+
+  /** Extends the climbers out to their high limit. */
+  public void climberExtend() {
+    if (leftpos < k_highlimit && leftpos > 0 && !(leftpos > k_highlimit)) {
+      m_leftclimber.setVoltage(3);
+    } else {
+      m_leftclimber.setVoltage(0);
+    }
+    if (rightpos < k_highlimit && rightpos > 0 && !(rightpos > k_highlimit)) {
+      m_rightclimber.setVoltage(3);
+    } else {
+      m_rightclimber.setVoltage(0);
     }
   }
 
-  /**
-   * Returns a boolean stating if left position and right position are within
-   * tolerance of each other.
-   */
-  public boolean isRational() {
-    return MathUtil.isNear(leftpos, rightpos, k_positiontolerance);
+  public void resetEncoders() {
+    m_leftclimber.setPosition(0);
+    m_rightclimber.setPosition(0);
   }
 
   /** Returns a pair of doubles containing the positions. Left is first, right is second. */
@@ -123,5 +107,9 @@ public class Climber extends SubsystemBase {
     // update positions periodically
     leftpos = (m_leftclimber.getPosition().getValue().in(Units.Rotations) / k_climberratio) * k_climberwinchcirc;
     rightpos = (m_rightclimber.getPosition().getValue().in(Units.Rotations) / k_climberratio) * k_climberwinchcirc;
+
+    // positions
+    SmartDashboard.putNumber("leftpos", leftpos);
+    SmartDashboard.putNumber("rightpose", rightpos);
   }
 }
