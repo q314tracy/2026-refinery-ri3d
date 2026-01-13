@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
 
   /** Runs the intake in revers to clear jams or dump game pieces. Maybe.*/
   public void outtake() {
-    m_intakerollers.setVoltage(-6);
+    m_intakerollers.setVoltage(-12);
   }
 
   /** Stops the motor. */

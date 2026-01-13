@@ -78,23 +78,13 @@ public class Climber extends SubsystemBase {
     m_rightclimber.stopMotor();
   }
 
-  /** Extends the climbers out to their high limit. */
-  public void climberExtend() {
-    if (leftpos < k_highlimit && leftpos > 0 && !(leftpos > k_highlimit)) {
-      m_leftclimber.setVoltage(3);
-    } else {
-      m_leftclimber.setVoltage(0);
-    }
-    if (rightpos < k_highlimit && rightpos > 0 && !(rightpos > k_highlimit)) {
-      m_rightclimber.setVoltage(3);
-    } else {
-      m_rightclimber.setVoltage(0);
-    }
-  }
-
   public void resetEncoders() {
     m_leftclimber.setPosition(0);
     m_rightclimber.setPosition(0);
+  }
+
+  public double averageDistance() {
+    return (leftpos + rightpos) / 2;
   }
 
   /** Returns a pair of doubles containing the positions. Left is first, right is second. */

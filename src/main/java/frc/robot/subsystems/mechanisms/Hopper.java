@@ -28,7 +28,7 @@ public class Hopper extends SubsystemBase {
 
   /** Retracts the hopper extension. */
   public void retract() {
-    m_hopperextend.setVoltage(-6);
+    m_hopperextend.setVoltage(-3);
   }
 
   /** Stops the motor. */

@@ -237,13 +237,14 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
     /** Configures PPlib autobuilder. Run only at init in robot container. */
     public void configureAutobuilder() {
+        SwerveRequest.ApplyRobotSpeeds auto_req = new SwerveRequest.ApplyRobotSpeeds();
         AutoBuilder.configure(
         () -> super.getState().Pose, // Robot pose supplier
         super::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
         () -> super.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs feedforwards if OL
-        (speeds, feedforwards) -> this.applyRequest(() -> new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds)),
-        new PPHolonomicDriveController( // Built in POPLib holonomic controller
+        (speeds, feedforwards) -> this.setControl(auto_req.withSpeeds(speeds)),
+        new PPHolonomicDriveController( // Built in PPLib holonomic controller
             new PIDConstants(5, 0.0, 0.0), // Translation PID constants
             new PIDConstants(5, 0.0, 0.0) // Rotation PID constants
         ),
@@ -264,7 +265,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     }
 
     public Command pathfind(Pose2d pose) {
-        return AutoBuilder.pathfindToPose(pose, PathConstraints.unlimitedConstraints(12));
+        Command cmd = AutoBuilder.pathfindToPose(pose, PathConstraints.unlimitedConstraints(12));
+        cmd.addRequirements(this);
+        return cmd;
     }
 
     /**

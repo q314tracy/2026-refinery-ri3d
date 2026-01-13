@@ -45,7 +45,7 @@ public class Constants {
     public static final double k_shootermotormaxspeed = 6000.0; //rpm
     public static final double k_shootermaxvel = ((k_shootermotormaxspeed / k_shooterratio) * k_shooterwheelcircum) / 60; //m/s
     // PIDF constants, needs characterized
-    public static final double k_velocitykP = 0.1;
+    public static final double k_velocitykP = 0.5;
     public static final double k_velocitykI = 0;
     public static final double k_velocitykD = 0;
     public static final double k_velocitykS = 0; // characterize pls
@@ -97,7 +97,7 @@ public class Constants {
     public static final int k_rightclimberID = 25;
     public static final TalonFXConfiguration k_climberconfig = new TalonFXConfiguration();
     static {
-      k_climberconfig.CurrentLimits.StatorCurrentLimit = 10;
+      k_climberconfig.CurrentLimits.StatorCurrentLimit = 60;
       k_climberconfig.CurrentLimits.StatorCurrentLimitEnable = true;
       k_climberconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       k_climberconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -111,7 +111,7 @@ public class Constants {
     public static final double k_climbermotormaxspeed = 6000; //rpm, currently kraken x60
     public static final double k_climbermaxvel = ((k_climbermotormaxspeed / k_climberratio) * k_climberwinchcirc) / 60; //m/s
     // PIDF for climbing
-    public static final double k_climberkP = 0.01;
+    public static final double k_climberkP = 0.1;
     public static final double k_climberkI = 0;
     public static final double k_climberkD = 0;
     public static final double k_climberkS = 0.1;
