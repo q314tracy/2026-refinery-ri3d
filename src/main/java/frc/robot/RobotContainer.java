@@ -24,14 +24,14 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import frc.robot.other.deprecated.CTRESwerve;
+import frc.robot.other.deprecated.SwerveTelemetry;
+import frc.robot.other.deprecated.SwerveTunerConstants;
 import frc.robot.subsystems.mechanisms.Climber;
 import frc.robot.subsystems.mechanisms.Feeder;
 import frc.robot.subsystems.mechanisms.Hopper;
 import frc.robot.subsystems.mechanisms.Intake;
 import frc.robot.subsystems.mechanisms.Shooter;
-import frc.robot.subsystems.swerve.CTRESwerve;
-import frc.robot.subsystems.swerve.SwerveTelemetry;
-import frc.robot.subsystems.swerve.SwerveTunerConstants;
 import frc.robot.utils.Constants.ClimberConstants;
 import frc.robot.utils.Constants.OIConstants;
 import frc.robot.utils.Constants.SwerveConstants;

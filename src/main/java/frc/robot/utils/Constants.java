@@ -14,7 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swerve.SwerveTunerConstants;
+import frc.robot.other.deprecated.SwerveTunerConstants;
 
 public class Constants {
 

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.other.deprecated;
 
 import java.util.function.Supplier;
 
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.subsystems.swerve.SwerveTunerConstants.TunerSwerveDrivetrain;
+import frc.robot.other.deprecated.SwerveTunerConstants.TunerSwerveDrivetrain;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -162,15 +162,19 @@ public class CTRESwerve extends TunerSwerveDrivetrain implements Subsystem {
     /** Configures PPlib autobuilder. Run only at init in robot container. */
     public void configureAutobuilder() {
         AutoBuilder.configure(
-                this::getPose, // Robot pose supplier
+                () -> this.getState().Pose, // Robot pose supplier
                 this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-                this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                () -> this.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also
                 // optionally outputs feedforwards if OL
-                this::autoDrive,
+                (speeds, feedforwards) -> this.setControl(
+                        new SwerveRequest.ApplyRobotSpeeds()
+                                .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                                .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                                .withSpeeds(speeds)),
                 new PPHolonomicDriveController(
-                    new PIDConstants(5, 0),
-                    new PIDConstants(5, 0)),
+                        new PIDConstants(5, 0),
+                        new PIDConstants(5, 0)),
                 m_PPconfig, // The robot configuration
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
@@ -189,6 +193,7 @@ public class CTRESwerve extends TunerSwerveDrivetrain implements Subsystem {
 
     /**
      * Returns the current estimated pose of the robot.
+     * 
      * @return The pose.
      */
     public Pose2d getPose() {
@@ -197,6 +202,7 @@ public class CTRESwerve extends TunerSwerveDrivetrain implements Subsystem {
 
     /**
      * Returns the current robot-relative speeds.
+     * 
      * @return The speeds.
      */
     public ChassisSpeeds getSpeeds() {
@@ -217,11 +223,11 @@ public class CTRESwerve extends TunerSwerveDrivetrain implements Subsystem {
     /**
      * Used by PathPlanner to operate the drivetrain given robot-relative speeds.
      * 
-     * @param speeds Robot relative speeds.
+     * @param speeds       Robot relative speeds.
      * @param feedforwards Optional feedforwards.
      */
     public void autoDrive(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds));
+
     }
 
     @Override

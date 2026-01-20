@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.other.deprecated;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
