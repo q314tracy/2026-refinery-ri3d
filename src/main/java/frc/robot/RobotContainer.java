@@ -24,14 +24,14 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.mechanisms.Climber;
 import frc.robot.subsystems.mechanisms.Feeder;
 import frc.robot.subsystems.mechanisms.Hopper;
 import frc.robot.subsystems.mechanisms.Intake;
 import frc.robot.subsystems.mechanisms.Shooter;
-import frc.robot.utils.SwerveTelemetry;
-import frc.robot.utils.SwerveTunerConstants;
+import frc.robot.subsystems.swerve.CTRESwerve;
+import frc.robot.subsystems.swerve.SwerveTelemetry;
+import frc.robot.subsystems.swerve.SwerveTunerConstants;
 import frc.robot.utils.Constants.ClimberConstants;
 import frc.robot.utils.Constants.OIConstants;
 import frc.robot.utils.Constants.SwerveConstants;
@@ -43,7 +43,7 @@ public class RobotContainer {
 
   // other subsystems
   private final SwerveTelemetry m_swervetelemetry = new SwerveTelemetry(SwerveConstants.k_maxlinspeed);
-  private final Swerve m_swerve = SwerveTunerConstants.createDrivetrain();
+  private final CTRESwerve m_swerve = SwerveTunerConstants.createDrivetrain();
   private final Climber m_climber = new Climber();
   private final Shooter m_shooter = new Shooter();
   private final Feeder m_feeder = new Feeder();
