@@ -6,18 +6,13 @@ package frc.robot.subsystems.mechanisms;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utils.Constants.ClimberConstants;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static frc.robot.utils.Constants.ClimberConstants.*;
 
 public class Climber extends SubsystemBase {

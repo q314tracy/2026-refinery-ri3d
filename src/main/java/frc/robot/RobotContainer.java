@@ -19,6 +19,7 @@ import static frc.robot.utils.Constants.ShooterConstants.k_shootermaxvel;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -79,7 +80,7 @@ public class RobotContainer {
     Pathfinding.setPathfinder(new LocalADStar());
     m_swerve.configureAutobuilder();
     // add autos
-    m_autochooser.setDefaultOption("Pathfind 1", m_swerve.pathfind(new Pose2d(2, 2, new Rotation2d())));
+    // m_autochooser.setDefaultOption("Pathfind 1", m_swerve.pathfind(new Pose2d(2, 2, new Rotation2d())));
     SmartDashboard.putData(m_autochooser);
     // default commands
     m_shooter.setDefaultCommand(shooterDefault());
@@ -125,13 +126,13 @@ public class RobotContainer {
     return m_swerve.applyRequest(() -> new SwerveRequest.FieldCentric()
         .withRotationalDeadband(SwerveConstants.k_maxrotspeed * OIConstants.k_deadzone) // 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // Use open-loop control for drive motors
-        .withVelocityX(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(1), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.1) // x velocity
-        .withVelocityY(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(0), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.1) // y velocity
+        .withVelocityX(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(1), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.5) // x velocity
+        .withVelocityY(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(0), OIConstants.k_deadzone) * SwerveConstants.k_maxlinspeed * 0.5) // y velocity
         .withRotationalRate(MathUtil.applyDeadband(-m_driverctlr.getRawAxis(4), OIConstants.k_deadzone) * SwerveConstants.k_maxrotspeed) // z rot velocity
     );
   }
 
   public Command getAutonomousCommand() {
-    return m_swerve.pathfind(new Pose2d(1, 1, new Rotation2d()));
+    return AutoBuilder.pathfindToPose(new Pose2d(1, 1, new Rotation2d()), PathConstraints.unlimitedConstraints(12));
   }
 }
